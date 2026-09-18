@@ -1,21 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { WindowsIcon } from './WindowsIcon';
 import { LiveClock } from './LiveClock';
 
-type ClockStyleVariant = 'side-weather' | 'large-info' | 'compact' | 'vertical' | 'horizontal';
 
 export const Hero: React.FC = () => {
-  const [variant, setVariant] = useState<ClockStyleVariant>('side-weather');
-  const [isLive, setIsLive] = useState(true);
-
-  const styleOptions: { id: ClockStyleVariant; label: string }[] = [
-    { id: 'side-weather', label: 'Side by Side' },
-    { id: 'large-info', label: 'Day + Date' },
-    { id: 'compact', label: 'Compact' },
-    { id: 'vertical', label: 'Vertical' },
-    { id: 'horizontal', label: 'Horizontal' },
-  ];
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-28 pb-16">
       {/* Cinematic Background Mountain Landscape */}
@@ -32,7 +20,7 @@ export const Hero: React.FC = () => {
 
       {/* Main Content Grid */}
       <div className="relative z-10 max-w-7xl w-full mx-auto px-6 sm:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
-        {/* Left Column: Typography, Download CTA, and Style Switcher */}
+        {/* Left Column: Typography and Download CTA */}
         <div className="lg:col-span-7 flex flex-col items-start">
           <h1 className="text-4xl sm:text-6xl lg:text-[76px] font-bold tracking-tighter text-white leading-[1.05] mb-6">
             A better clock<br />
@@ -44,7 +32,7 @@ export const Hero: React.FC = () => {
           </p>
 
           {/* Primary CTA */}
-          <div className="flex flex-col items-start space-y-3 mb-10">
+          <div className="flex flex-col items-start space-y-3">
             <a
               href="https://github.com/taruntejaguna/Oneplusclock/releases/latest"
               target="_blank"
@@ -59,42 +47,9 @@ export const Hero: React.FC = () => {
               Free · Windows 11
             </span>
           </div>
-
-          {/* Style Selector Chips */}
-          <div className="flex flex-col space-y-2.5 pt-2">
-            <span className="text-xs font-semibold text-neutral-400 tracking-wider uppercase">
-              Clock Styles:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {styleOptions.map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => setVariant(opt.id)}
-                  className={`text-xs px-3.5 py-1.5 rounded-full font-medium transition-all duration-200 ${
-                    variant === opt.id
-                      ? 'bg-white text-black font-semibold shadow-sm'
-                      : 'bg-white/10 hover:bg-white/15 text-neutral-300 border border-white/[0.06]'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-              <button
-                onClick={() => setIsLive(!isLive)}
-                className={`text-xs px-3 py-1.5 rounded-full font-medium transition-all duration-200 border ${
-                  isLive
-                    ? 'bg-[#E92828]/20 text-[#E92828] border-[#E92828]/40'
-                    : 'bg-white/5 text-neutral-400 border-white/[0.06]'
-                }`}
-                title="Toggle between live system time and showcase mock time"
-              >
-                {isLive ? '● Live Time' : '○ Static Time'}
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* Right Column: Floating Desktop Clock with Day & Weather */}
+        {/* Right Column: Floating Desktop Clock */}
         <div className="lg:col-span-5 flex items-center justify-start lg:justify-end">
           <div className="relative group cursor-default">
             {/* Ambient Red & Atmospheric Glow */}
@@ -104,9 +59,9 @@ export const Hero: React.FC = () => {
             <div className="relative p-6 sm:p-8 rounded-3xl backdrop-blur-sm bg-black/20 border border-white/[0.08] shadow-2xl transition-all duration-300 hover:border-white/15 hover:bg-black/25">
               <LiveClock
                 size="lg"
-                live={isLive}
+                live={true}
                 timeString="19:48"
-                variant={variant}
+                variant="side-weather"
                 showWeather={true}
                 showDay={true}
                 showDate={true}
