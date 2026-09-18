@@ -1,0 +1,712 @@
+/* OnePlus Desktop Clock - Design System */
+
+:root {
+  --op-red: #E92828;
+  --op-red-hover: #D82020;
+  --op-red-glow: rgba(233, 40, 40, 0.25);
+
+  /* Dark mode by default */
+  --text-primary: #FFFFFF;
+  --text-secondary: #EDEDED;
+  --text-tertiary: #B0B0B0;
+  
+  --settings-bg: rgba(26, 26, 28, 0.95);
+  --settings-card-bg: rgba(255, 255, 255, 0.06);
+  --settings-card-border: rgba(255, 255, 255, 0.1);
+  --settings-text: #F3F3F3;
+  --settings-subtext: #9E9E9E;
+  --settings-control-bg: rgba(255, 255, 255, 0.1);
+  --settings-control-active: #E92828;
+}
+
+[data-theme="light"] {
+  --text-primary: #111111;
+  --text-secondary: #2C2C2C;
+  --text-tertiary: #666666;
+
+  --settings-bg: rgba(248, 249, 250, 0.96);
+  --settings-card-bg: rgba(0, 0, 0, 0.04);
+  --settings-card-border: rgba(0, 0, 0, 0.08);
+  --settings-text: #1A1A1A;
+  --settings-subtext: #666666;
+  --settings-control-bg: rgba(0, 0, 0, 0.07);
+  --settings-control-active: #E92828;
+}
+
+* {
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  overflow: hidden;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* App Canvas */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: grab;
+}
+
+.app-container:active {
+  cursor: grabbing;
+}
+
+/* Clock Widget Root - Completely frameless, transparent */
+.clock-widget {
+  display: inline-flex;
+  flex-direction: column;
+  position: relative;
+  background: transparent !important;
+  color: var(--text-primary);
+  transition: opacity 0.2s ease;
+}
+
+/* Sizing Tokens */
+.size-small {
+  --clock-font-size: 3.5rem;
+  --secondary-font-size: 0.95rem;
+  --weather-icon-size: 1.1rem;
+  --letter-spacing: -0.03em;
+}
+
+.size-medium {
+  --clock-font-size: 5rem;
+  --secondary-font-size: 1.25rem;
+  --weather-icon-size: 1.4rem;
+  --letter-spacing: -0.035em;
+}
+
+.size-large {
+  --clock-font-size: 6.5rem;
+  --secondary-font-size: 1.5rem;
+  --weather-icon-size: 1.7rem;
+  --letter-spacing: -0.04em;
+}
+
+.size-huge {
+  --clock-font-size: 8rem;
+  --secondary-font-size: 1.85rem;
+  --weather-icon-size: 2.1rem;
+  --letter-spacing: -0.045em;
+}
+
+/* Typography elements */
+.clock-time-row {
+  display: flex;
+  align-items: baseline;
+  font-size: var(--clock-font-size);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: var(--letter-spacing);
+  font-feature-settings: "tnum" on, "lnum" on;
+}
+
+.digit {
+  display: inline-block;
+  color: var(--text-primary);
+}
+
+.digit.accent-red {
+  color: var(--op-red) !important;
+}
+
+.colon-separator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+  margin: 0 0.04em;
+  position: relative;
+  top: -0.04em;
+  color: var(--text-primary);
+}
+
+.seconds-display {
+  font-size: calc(var(--clock-font-size) * 0.42);
+  margin-left: 0.1em;
+  opacity: 0.85;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+.am-pm {
+  font-size: calc(var(--clock-font-size) * 0.28);
+  margin-left: 0.25em;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+/* Secondary info styling */
+.secondary-text {
+  font-size: var(--secondary-font-size);
+  font-weight: 500;
+  color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+}
+
+.weather-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-weight: 500;
+}
+
+.weather-icon {
+  width: var(--weather-icon-size);
+  height: var(--weather-icon-size);
+  fill: currentColor;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Variant 1 - Horizontal */
+.variant-horizontal {
+  align-items: center;
+  justify-content: center;
+}
+
+/* Variant 2 - Vertical */
+.variant-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.variant-vertical .vertical-stack {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.82;
+  font-size: var(--clock-font-size);
+  font-weight: 500;
+  letter-spacing: var(--letter-spacing);
+}
+
+.variant-vertical .hour-row,
+.variant-vertical .minute-row {
+  display: flex;
+  align-items: baseline;
+}
+
+/* Variant 3 - Day + Clock */
+.variant-day-clock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.variant-day-clock .day-label {
+  font-size: var(--secondary-font-size);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: calc(var(--clock-font-size) * 0.05);
+}
+
+.variant-day-clock .date-label {
+  font-size: var(--secondary-font-size);
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-top: calc(var(--clock-font-size) * 0.05);
+}
+
+/* Variant 4 - Clock + Weather Side (Screenshot 1) */
+.variant-clock-weather-side {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: calc(var(--clock-font-size) * 0.2);
+}
+
+.variant-clock-weather-side .side-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: max-content;
+}
+
+/* Variant 5 - Compact (Screenshot 5) */
+.variant-compact {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--clock-font-size) * 0.04);
+}
+
+/* Variant 6 - Large Info (Screenshot 4) */
+.variant-large-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--clock-font-size) * 0.04);
+}
+
+.variant-large-info .day-label {
+  font-size: var(--secondary-font-size);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.variant-large-info .bottom-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: var(--secondary-font-size);
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+/* Variant 7 - Vertical + Weather (Screenshot 2) */
+.variant-vertical-weather {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--clock-font-size) * 0.03);
+}
+
+.variant-vertical-weather .vertical-stack {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.82;
+  font-size: var(--clock-font-size);
+  font-weight: 500;
+  letter-spacing: var(--letter-spacing);
+  margin-top: calc(var(--clock-font-size) * 0.05);
+}
+
+/* Toast alert when click-through is enabled */
+.clickthrough-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 22, 0.95);
+  color: #FFFFFF;
+  border: 1px solid rgba(233, 40, 40, 0.4);
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+  animation: toastFadeIn 0.3s ease, toastFadeOut 0.5s ease 4.5s forwards;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes toastFadeIn {
+  from { opacity: 0; transform: translate(-50%, 15px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes toastFadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+/* Settings Modal - Completely transparent overlay (NO black box on desktop) */
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.settings-modal {
+  width: 92%;
+  max-width: 440px;
+  max-height: 88vh;
+  background: #18181A !important;
+  color: #F3F3F3;
+  border-radius: 20px;
+  padding: 0;
+  box-shadow: none !important; /* Zero black shadow around the app */
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Clean rounded corners with no scrollbar overflow */
+  animation: slideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] .settings-modal {
+  background: #FFFFFF !important;
+  color: #1A1A1A;
+  box-shadow: none !important;
+  border: 1px solid rgba(0, 0, 0, 0.12) !important;
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 14px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: grab;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .settings-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.settings-header:active {
+  cursor: grabbing;
+}
+
+/* Modern clean scrollable container */
+.settings-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 18px 22px 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+[data-theme="light"] .settings-body {
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+/* Custom modern OxygenOS scrollbar (replaces ugly default Windows box scrollbar) */
+.settings-body::-webkit-scrollbar,
+.settings-modal::-webkit-scrollbar,
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.settings-body::-webkit-scrollbar-track,
+.settings-modal::-webkit-scrollbar-track,
+::-webkit-scrollbar-track {
+  background: transparent !important;
+  margin: 8px 0;
+}
+
+.settings-body::-webkit-scrollbar-thumb,
+.settings-modal::-webkit-scrollbar-thumb,
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  transition: background 0.15s ease;
+}
+
+.settings-body::-webkit-scrollbar-thumb:hover,
+.settings-modal::-webkit-scrollbar-thumb:hover,
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.42);
+}
+
+.settings-body::-webkit-scrollbar-button,
+.settings-modal::-webkit-scrollbar-button,
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.settings-body::-webkit-scrollbar-corner,
+.settings-modal::-webkit-scrollbar-corner,
+::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+[data-theme="light"] .settings-body::-webkit-scrollbar-thumb,
+[data-theme="light"] .settings-modal::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .settings-body::-webkit-scrollbar-thumb:hover,
+[data-theme="light"] .settings-modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.38);
+}
+
+.settings-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.close-btn {
+  background: transparent;
+  border: none;
+  color: var(--settings-subtext);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.close-btn:hover {
+  background: var(--settings-control-bg);
+  color: var(--settings-text);
+}
+
+/* Settings section */
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.section-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--settings-subtext);
+}
+
+/* Variant grid */
+.variant-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.variant-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1.5px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 8px 4px 7px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 82px;
+}
+
+[data-theme="light"] .variant-card {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1.5px solid rgba(0, 0, 0, 0.09);
+}
+
+.variant-card:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+[data-theme="light"] .variant-card:hover {
+  background: rgba(0, 0, 0, 0.07);
+}
+
+.variant-card.active {
+  border-color: var(--op-red);
+  background: rgba(233, 40, 40, 0.18) !important;
+  box-shadow: 0 0 0 1px var(--op-red);
+}
+
+.variant-card-title {
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #B0B0B0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+[data-theme="light"] .variant-card-title {
+  color: #555555;
+}
+
+.variant-card.active .variant-card-title {
+  color: #FFFFFF;
+  font-weight: 600;
+}
+
+[data-theme="light"] .variant-card.active .variant-card-title {
+  color: #111111;
+}
+
+.variant-preview-mini {
+  font-size: 0.92rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #FFFFFF;
+  width: 100%;
+}
+
+[data-theme="light"] .variant-preview-mini {
+  color: #111111;
+}
+
+.preview-sub {
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: #9E9E9E;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+[data-theme="light"] .preview-sub {
+  color: #666666;
+}
+
+/* Option Row */
+.option-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--settings-card-bg);
+  border-radius: 14px;
+  border: 1px solid var(--settings-card-border);
+}
+
+.option-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.option-title {
+  font-size: 0.92rem;
+  font-weight: 500;
+}
+
+.option-desc {
+  font-size: 0.75rem;
+  color: var(--settings-subtext);
+}
+
+/* Switch Toggle */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: var(--settings-control-bg);
+  transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 24px;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #FFFFFF;
+  transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+}
+
+input:checked + .toggle-slider {
+  background-color: var(--op-red);
+}
+
+input:checked + .toggle-slider:before {
+  transform: translateX(20px);
+}
+
+/* Segmented Control */
+.segmented-control {
+  display: flex;
+  background: var(--settings-card-bg);
+  border: 1px solid var(--settings-card-border);
+  padding: 3px;
+  border-radius: 14px;
+  gap: 3px;
+}
+
+.segment-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--settings-subtext);
+  font-size: 0.8rem;
+  font-weight: 500;
+  padding: 7px 10px;
+  border-radius: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.segment-btn:hover {
+  color: var(--settings-text);
+}
+
+.segment-btn.active {
+  background: var(--op-red);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(233, 40, 40, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+}
