@@ -69,28 +69,45 @@ fn save_position(app: AppHandle, x: i32, y: i32) -> Result<(), String> {
     Ok(())
 }
 
+fn is_position_on_screen(window: &WebviewWindow, x: i32, y: i32) -> bool {
+    if let Ok(monitors) = window.available_monitors() {
+        if monitors.is_empty() {
+            return true;
+        }
+        let win_size = window.outer_size().unwrap_or(tauri::PhysicalSize::new(650, 400));
+        let win_w = win_size.width as i32;
+        let win_h = win_size.height as i32;
+
+        for monitor in monitors {
+            let mon_pos = monitor.position();
+            let mon_size = monitor.size();
+            let mon_x = mon_pos.x;
+            let mon_y = mon_pos.y;
+            let mon_w = mon_size.width as i32;
+            let mon_h = mon_size.height as i32;
+
+            let overlap_x = (x < mon_x + mon_w - 50) && (x + win_w > mon_x + 50);
+            let overlap_y = (y < mon_y + mon_h - 50) && (y + win_h > mon_y + 50);
+            if overlap_x && overlap_y {
+                return true;
+            }
+        }
+        false
+    } else {
+        true
+    }
+}
+
 fn ensure_window_visible(window: &WebviewWindow) {
     let _ = window.show();
     let _ = window.unminimize();
 
-    let mut offscreen = false;
-    if let (Ok(Some(monitor)), Ok(pos)) = (window.current_monitor(), window.outer_position()) {
-        let size = monitor.size();
-        let mon_pos = monitor.position();
-        let min_x = mon_pos.x - 50;
-        let max_x = mon_pos.x + size.width as i32 - 100;
-        let min_y = mon_pos.y - 50;
-        let max_y = mon_pos.y + size.height as i32 - 100;
-        if pos.x < min_x || pos.x > max_x || pos.y < min_y || pos.y > max_y {
-            offscreen = true;
+    if let Ok(pos) = window.outer_position() {
+        if !is_position_on_screen(window, pos.x, pos.y) {
+            log_debug("Window is off-screen; recentering.");
+            let _ = window.center();
         }
     }
-    if offscreen {
-        log_debug("Window is off-screen; recentering.");
-        let _ = window.center();
-    }
-
-    let _ = window.set_always_on_top(true);
     let _ = window.set_focus();
 }
 
@@ -103,25 +120,17 @@ fn get_saved_position(app: AppHandle) -> Option<(i32, i32)> {
     match (config.x, config.y) {
         (Some(x), Some(y)) => {
             if let Some(window) = app.get_webview_window("main") {
-                if let Ok(Some(monitor)) = window.current_monitor() {
-                    let size = monitor.size();
-                    let mon_pos = monitor.position();
-                    let min_x = mon_pos.x;
-                    let max_x = mon_pos.x + size.width as i32 - 150;
-                    let min_y = mon_pos.y;
-                    let max_y = mon_pos.y + size.height as i32 - 100;
-                    if x >= min_x && x <= max_x && y >= min_y && y <= max_y {
-                        return Some((x, y));
-                    } else {
-                        log_debug(&format!("Saved position ({}, {}) is outside monitor bounds. Will center instead.", x, y));
-                        return None;
-                    }
+                if is_position_on_screen(&window, x, y) {
+                    Some((x, y))
+                } else {
+                    log_debug(&format!(
+                        "Saved position ({}, {}) is outside monitor bounds. Will center instead.",
+                        x, y
+                    ));
+                    None
                 }
-            }
-            if x >= 0 && y >= 0 && x < 3800 && y < 2100 {
-                Some((x, y))
             } else {
-                None
+                Some((x, y))
             }
         }
         _ => None,
@@ -129,16 +138,42 @@ fn get_saved_position(app: AppHandle) -> Option<(i32, i32)> {
 }
 
 #[tauri::command]
-fn set_click_through(window: WebviewWindow, enabled: bool) -> Result<(), String> {
+fn set_click_through(app: AppHandle, window: WebviewWindow, enabled: bool) -> Result<(), String> {
     log_debug(&format!("set_click_through: enabled={}", enabled));
+    if let Some(path) = get_config_path(&app) {
+        if let Some(parent) = path.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        let mut config: AppConfig = fs::read_to_string(&path)
+            .ok()
+            .and_then(|data| serde_json::from_str(&data).ok())
+            .unwrap_or_default();
+        config.click_through = Some(enabled);
+        if let Ok(json) = serde_json::to_string_pretty(&config) {
+            let _ = fs::write(&path, json);
+        }
+    }
     window
         .set_ignore_cursor_events(enabled)
         .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
-fn set_always_on_top(window: WebviewWindow, enabled: bool) -> Result<(), String> {
+fn set_always_on_top(app: AppHandle, window: WebviewWindow, enabled: bool) -> Result<(), String> {
     log_debug(&format!("set_always_on_top: enabled={}", enabled));
+    if let Some(path) = get_config_path(&app) {
+        if let Some(parent) = path.parent() {
+            let _ = fs::create_dir_all(parent);
+        }
+        let mut config: AppConfig = fs::read_to_string(&path)
+            .ok()
+            .and_then(|data| serde_json::from_str(&data).ok())
+            .unwrap_or_default();
+        config.always_on_top = Some(enabled);
+        if let Ok(json) = serde_json::to_string_pretty(&config) {
+            let _ = fs::write(&path, json);
+        }
+    }
     window
         .set_always_on_top(enabled)
         .map_err(|e| e.to_string())
@@ -243,6 +278,28 @@ pub fn run() {
                     window.outer_position(),
                     window.inner_size()
                 ));
+                let mut restored = false;
+                if let Some(path) = get_config_path(app.handle()) {
+                    if let Ok(data) = fs::read_to_string(path) {
+                        if let Ok(config) = serde_json::from_str::<AppConfig>(&data) {
+                            if let (Some(x), Some(y)) = (config.x, config.y) {
+                                if is_position_on_screen(&window, x, y) {
+                                    let _ = window.set_position(PhysicalPosition::new(x, y));
+                                    restored = true;
+                                }
+                            }
+                            if let Some(true) = config.always_on_top {
+                                let _ = window.set_always_on_top(true);
+                            }
+                            if let Some(true) = config.click_through {
+                                let _ = window.set_ignore_cursor_events(true);
+                            }
+                        }
+                    }
+                }
+                if !restored {
+                    let _ = window.center();
+                }
                 ensure_window_visible(&window);
             } else {
                 log_debug("ERROR: main window not found in setup()!");

@@ -82,28 +82,24 @@ html, body, #root {
 .size-small {
   --clock-font-size: 3.5rem;
   --secondary-font-size: 0.95rem;
-  --weather-icon-size: 1.1rem;
   --letter-spacing: -0.03em;
 }
 
 .size-medium {
   --clock-font-size: 5rem;
   --secondary-font-size: 1.25rem;
-  --weather-icon-size: 1.4rem;
   --letter-spacing: -0.035em;
 }
 
 .size-large {
   --clock-font-size: 6.5rem;
   --secondary-font-size: 1.5rem;
-  --weather-icon-size: 1.7rem;
   --letter-spacing: -0.04em;
 }
 
 .size-huge {
   --clock-font-size: 8rem;
   --secondary-font-size: 1.85rem;
-  --weather-icon-size: 2.1rem;
   --letter-spacing: -0.045em;
 }
 
@@ -167,22 +163,6 @@ html, body, #root {
   white-space: nowrap;
 }
 
-.weather-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3em;
-  font-weight: 500;
-}
-
-.weather-icon {
-  width: var(--weather-icon-size);
-  height: var(--weather-icon-size);
-  fill: currentColor;
-  flex-shrink: 0;
-  display: inline-block;
-  vertical-align: middle;
-}
-
 /* Variant 1 - Horizontal */
 .variant-horizontal {
   align-items: center;
@@ -193,12 +173,14 @@ html, body, #root {
 .variant-vertical {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
 .variant-vertical .vertical-stack {
   display: flex;
   flex-direction: column;
+  align-items: center;
   line-height: 0.82;
   font-size: var(--clock-font-size);
   font-weight: 500;
@@ -209,13 +191,15 @@ html, body, #root {
 .variant-vertical .minute-row {
   display: flex;
   align-items: baseline;
+  justify-content: center;
 }
 
 /* Variant 3 - Day + Clock */
 .variant-day-clock {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
 .variant-day-clock .day-label {
@@ -223,6 +207,8 @@ html, body, #root {
   font-weight: 500;
   color: var(--text-primary);
   margin-bottom: calc(var(--clock-font-size) * 0.05);
+  text-align: center;
+  width: 100%;
 }
 
 .variant-day-clock .date-label {
@@ -230,73 +216,20 @@ html, body, #root {
   font-weight: 400;
   color: var(--text-primary);
   margin-top: calc(var(--clock-font-size) * 0.05);
-}
-
-/* Variant 4 - Clock + Weather Side (Screenshot 1) */
-.variant-clock-weather-side {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: calc(var(--clock-font-size) * 0.2);
+  justify-content: center;
+  text-align: center;
+  width: 100%;
 }
 
-.variant-clock-weather-side .side-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.15em;
-  white-space: nowrap;
-  flex-shrink: 0;
-  min-width: max-content;
-}
-
-/* Variant 5 - Compact (Screenshot 5) */
+/* Variant 4 - Compact */
 .variant-compact {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: calc(var(--clock-font-size) * 0.04);
-}
-
-/* Variant 6 - Large Info (Screenshot 4) */
-.variant-large-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: calc(var(--clock-font-size) * 0.04);
-}
-
-.variant-large-info .day-label {
-  font-size: var(--secondary-font-size);
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.variant-large-info .bottom-info {
-  display: flex;
   align-items: center;
-  gap: 0.5em;
-  font-size: var(--secondary-font-size);
-  font-weight: 400;
-  color: var(--text-primary);
-}
-
-/* Variant 7 - Vertical + Weather (Screenshot 2) */
-.variant-vertical-weather {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: calc(var(--clock-font-size) * 0.03);
-}
-
-.variant-vertical-weather .vertical-stack {
-  display: flex;
-  flex-direction: column;
-  line-height: 0.82;
-  font-size: var(--clock-font-size);
-  font-weight: 500;
-  letter-spacing: var(--letter-spacing);
-  margin-top: calc(var(--clock-font-size) * 0.05);
+  text-align: center;
+  gap: calc(var(--clock-font-size) * 0.04);
 }
 
 /* Toast alert when click-through is enabled */

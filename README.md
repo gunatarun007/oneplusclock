@@ -8,21 +8,18 @@ An authentic, transparent floating Windows desktop clock inspired directly by Ox
 
 - **Direct Desktop Floating**: Frameless, transparent background with zero window chrome, title bars, borders, cards, or shadows.
 - **Iconic OnePlus Visual Hierarchy**: The first digit of the hour is OnePlus Red (`#E92828`); remaining digits are crisp white (or near-black in Light Mode).
-- **All 6 OxygenOS Clock Variants**:
-  1. **Horizontal**: Large clean `19:30`.
-  2. **Vertical**: Stacked `19` / `30` with ultra-tight vertical line spacing (`0.82em`).
-  3. **Day + Clock (5×3)**: `Friday` above `19:30`, `October 26` below.
-  4. **Clock + Weather Side (5×2)**: `19:30` on left, `☁ 26°` over `Oct 26, Fri` on right.
-  5. **Compact (5×2)**: `Oct 26, Fri ☁ 26°` top row, `19:30` bottom row.
-  6. **Large Information (5×3)**: `Friday`, `19:30`, `Oct 26 ☁ 26°`.
-  7. **Vertical + Weather (5×4)**: `Oct 26, Fri`, `Cloudy ☁ 26°`, stacked `19` / `30`.
+- **All 4 OxygenOS Clock Variants**:
+  1. **Horizontal**: Large clean `19:30` with optional date below.
+  2. **Vertical**: Stacked `19` / `30` with ultra-tight vertical line spacing (`0.82em`) and optional date.
+  3. **Day + Clock**: `Friday` above `19:30`, `October 26` below.
+  4. **Compact**: `Oct 26, Fri` above `19:30`.
 - **Desktop Dragging & Multi-Monitor Position Memory**: Smooth native Windows OS dragging without lag or selection boxes. Automatically remembers exact screen coordinates across restarts.
-- **Always on Top**: Keeps the clock floating above active desktop applications.
-- **Click-Through Mode**: Passes all mouse clicks through to desktop icons, taskbars, and apps beneath the clock.
+- **Always on Top**: Keeps the clock floating above active desktop applications (disabled by default).
+- **Click-Through Mode**: Passes all mouse clicks through to desktop icons, taskbars, and apps beneath the clock (disabled by default).
 - **System Tray Integration**: OnePlus-branded notification area tray icon with context menu to toggle Always on Top, toggle Click-Through, open Settings, or Quit.
 - **Start with Windows**: Windows Registry Run key integration (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
 - **Near-Zero Idle CPU**: Smart time calculation that synchronizes to exact minute boundaries rather than polling intervals.
-- **High DPI Crispness**: Scalable vector typography using Plus Jakarta Sans matching OnePlus OxygenOS metrics.
+- **High DPI Crispness**: Scalable vector typography matching OnePlus OxygenOS metrics.
 
 ---
 
@@ -57,8 +54,8 @@ npm run tauri dev
   - **Right-Click** anywhere on the clock
   - **Double-Click** anywhere on the clock
   - **Click** the OnePlus Tray Icon in the Windows notification area
-- **Clock Styles**: Choose from 7 OnePlus OxygenOS layouts (all rendering Time, Date, and Weather).
-- **Auto-start**: Enabled by default to start seamlessly with Windows.
+- **Clock Styles**: Choose from 4 OnePlus OxygenOS layouts (Horizontal, Vertical, Day + Clock, Compact).
+- **Auto-start**: Option to launch widget automatically on Windows boot.
 - **Always on Top**: Keeps the clock floating above open desktop windows.
 - **Click-Through**: Turn on in Settings so mouse clicks pass through the clock to items underneath. (Click tray icon to toggle off).
 

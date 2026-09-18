@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { invoke } from '@tauri-apps/api/core';
 import { listen } from '@tauri-apps/api/event';
 import { useClock } from './hooks/useClock';
-import { fetchWeather, WeatherData } from './services/weather';
 import {
   SettingsModal,
   ClockSettings
@@ -11,25 +10,21 @@ import {
 import { VariantHorizontal } from './components/variants/VariantHorizontal';
 import { VariantVertical } from './components/variants/VariantVertical';
 import { VariantDayClock } from './components/variants/VariantDayClock';
-import { VariantClockWeatherSide } from './components/variants/VariantClockWeatherSide';
 import { VariantCompact } from './components/variants/VariantCompact';
-import { VariantLargeInfo } from './components/variants/VariantLargeInfo';
-import { VariantVerticalWeather } from './components/variants/VariantVerticalWeather';
 
 const SETTINGS_STORAGE_KEY = 'oneplus_clock_desktop_settings';
 
 const DEFAULT_SETTINGS: ClockSettings = {
-  variant: 'weather-side',
+  variant: 'horizontal',
   use24Hour: true,
   showSeconds: false,
   showDate: true,
-  showWeather: true,
   theme: 'dark',
   size: 'medium',
   opacity: '1.0',
   alwaysOnTop: false,
   clickThrough: false,
-  startWithWindows: true
+  startWithWindows: false
 };
 
 export const App: React.FC = () => {
@@ -47,59 +42,9 @@ export const App: React.FC = () => {
 
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [isWeatherLoading, setIsWeatherLoading] = useState(false);
-  const [weather, setWeather] = useState<WeatherData>({
-    temperature: 26,
-    conditionText: 'Cloudy',
-    conditionCode: 'cloudy'
-  });
 
   const clock = useClock(settings.use24Hour, settings.showSeconds);
   const isDraggingRef = useRef(false);
-
-  const loadWeather = useCallback(async (force = false) => {
-    setIsWeatherLoading(true);
-    try {
-      const data = await fetchWeather(force);
-      setWeather(data);
-    } catch {
-      // Ignore
-    } finally {
-      setIsWeatherLoading(false);
-    }
-  }, []);
-
-  // Initialize and auto-refresh weather
-  useEffect(() => {
-    loadWeather(false);
-
-    const handleOnline = () => {
-      loadWeather(true);
-    };
-    window.addEventListener('online', handleOnline);
-
-    // Periodic refresh
-    const interval = setInterval(() => {
-      loadWeather(false);
-    }, 15 * 60 * 1000);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      clearInterval(interval);
-    };
-  }, [loadWeather]);
-
-  // Compute display weather according to unit (°C / °F)
-  const displayWeather = React.useMemo(() => {
-    if (!weather) return weather;
-    if (settings.tempUnit === 'f') {
-      return {
-        ...weather,
-        temperature: Math.round((weather.temperature * 9) / 5 + 32)
-      };
-    }
-    return weather;
-  }, [weather, settings.tempUnit]);
 
   // Theme application
   useEffect(() => {
@@ -126,7 +71,7 @@ export const App: React.FC = () => {
     }
   }, [settings.clickThrough]);
 
-  // Native autostart sync on mount: always ensure registry points to current exe path
+  // Native autostart sync on mount
   useEffect(() => {
     if (settings.startWithWindows) {
       invoke('set_autostart', { enabled: true }).catch(() => {});
@@ -149,16 +94,10 @@ export const App: React.FC = () => {
     const unlistenShowClock = listen('tray-show-clock', () => {
       setIsSettingsOpen(false);
       invoke('set_click_through', { enabled: false }).catch(() => {});
-      if (!settings.alwaysOnTop) {
-        setTimeout(() => {
-          invoke('set_always_on_top', { enabled: false }).catch(() => {});
-        }, 1200);
-      }
     });
 
     const unlistenSettings = listen('tray-open-settings', () => {
       setIsSettingsOpen(true);
-      // Temporarily disable clickthrough so user can interact with modal if needed
       invoke('set_click_through', { enabled: false }).catch(() => {});
     });
 
@@ -184,7 +123,7 @@ export const App: React.FC = () => {
       unlistenOntop.then((f) => f());
       unlistenClickthrough.then((f) => f());
     };
-  }, [settings.alwaysOnTop]);
+  }, []);
 
   // Save settings when changed
   const handleUpdateSetting = useCallback(
@@ -211,7 +150,7 @@ export const App: React.FC = () => {
   const saveCurrentPosition = useCallback(async () => {
     try {
       const pos = await invoke<[number, number]>('get_window_position');
-      if (pos && Array.isArray(pos)) {
+      if (pos && Array.isArray(pos) && pos.length === 2) {
         await invoke('save_position', { x: pos[0], y: pos[1] });
       }
     } catch {
@@ -221,7 +160,6 @@ export const App: React.FC = () => {
 
   // Smooth native window dragging
   const handlePointerDown = (e: React.PointerEvent) => {
-    // If clicking on an interactive control, do not trigger window drag
     if (
       (e.target as HTMLElement).closest(
         'button, input, label, a, .toggle-switch, .segmented-control, .variant-card, .close-btn'
@@ -260,19 +198,11 @@ export const App: React.FC = () => {
     invoke('center_window').catch(() => {});
   };
 
-  // Render variant with full weather & date support
+  // Render variant
   const renderVariant = () => {
-    const safeWeather: WeatherData = displayWeather || {
-      temperature: 26,
-      conditionText: 'Cloudy',
-      conditionCode: 'cloudy'
-    };
-
     const props = {
       clock,
-      weather: safeWeather,
       showSeconds: settings.showSeconds,
-      showWeather: settings.showWeather,
       showDate: settings.showDate
     };
 
@@ -283,16 +213,10 @@ export const App: React.FC = () => {
         return <VariantVertical {...props} />;
       case 'day-clock':
         return <VariantDayClock {...props} />;
-      case 'weather-side':
-        return <VariantClockWeatherSide {...props} />;
       case 'compact':
         return <VariantCompact {...props} />;
-      case 'large-info':
-        return <VariantLargeInfo {...props} />;
-      case 'vertical-weather':
-        return <VariantVerticalWeather {...props} />;
       default:
-        return <VariantClockWeatherSide {...props} />;
+        return <VariantHorizontal {...props} />;
     }
   };
 
@@ -331,9 +255,7 @@ export const App: React.FC = () => {
           }
         }}
         settings={settings}
-        weather={displayWeather}
-        isWeatherLoading={isWeatherLoading}
-        onRefreshWeather={() => loadWeather(true)}
+        clock={clock}
         onUpdateSetting={handleUpdateSetting}
         onResetPosition={handleResetPosition}
         onStartDrag={handlePointerDown}

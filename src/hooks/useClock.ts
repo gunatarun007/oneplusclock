@@ -6,14 +6,14 @@ export interface ClockState {
   minutes: string;
   seconds: string;
   ampm: string;
-  dayName: string; // e.g. "Friday"
-  dayShort: string; // e.g. "Fri"
-  monthName: string; // e.g. "October"
-  monthShort: string; // e.g. "Oct"
-  dayNum: string; // e.g. "26"
-  dateShort: string; // e.g. "Oct 26, Fri"
-  dateWithMonth: string; // e.g. "October 26"
-  dateWeatherFormat: string; // e.g. "Oct 26"
+  dayName: string;
+  dayShort: string;
+  monthName: string;
+  monthShort: string;
+  dayNum: string;
+  dateShort: string;
+  dateWithMonth: string;
+  dateWeatherFormat: string;
 }
 
 const MONTHS_FULL = [
@@ -59,7 +59,6 @@ function formatClockState(now: Date, use24Hour: boolean): ClockState {
   const monthShort = MONTHS_SHORT[monthIdx];
   const dayNum = dayOfMonth.toString();
 
-  // Reference formats: "Oct 26, Fri", "October 26", "Oct 26"
   const dateShort = `${monthShort} ${dayNum}, ${dayShort}`;
   const dateWithMonth = `${monthName} ${dayNum}`;
   const dateWeatherFormat = `${monthShort} ${dayNum}`;
