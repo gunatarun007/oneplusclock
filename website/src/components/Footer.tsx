@@ -1,43 +1,41 @@
 import React from 'react';
-import { OnePlusLogo } from './OnePlusLogo';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="relative bg-[#08090B] border-t border-white/[0.06] py-10">
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs sm:text-[13px] text-neutral-400">
-        {/* Left: Brand Identity */}
-        <div className="flex items-center space-x-3">
-          <OnePlusLogo size={20} />
-          <span className="font-bold text-white tracking-tight">OnePlus Clock</span>
-          <span className="text-neutral-600">•</span>
-          <span>Minimal desktop clock for Windows.</span>
+    <footer className="border-t border-white/[0.04] py-12 px-6 sm:px-8 bg-[#050505]">
+      <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6 text-xs sm:text-sm text-[#8A8A8A]">
+        {/* Left */}
+        <div className="flex flex-col sm:flex-row items-center sm:space-x-3 text-center sm:text-left gap-1 sm:gap-0">
+          <span className="font-semibold text-[#F5F5F5]">OnePlus Clock</span>
+          <span className="hidden sm:inline text-neutral-600">•</span>
+          <span>A tiny clock for your Windows desktop.</span>
         </div>
 
-        {/* Right: Links */}
+        {/* Right */}
         <div className="flex items-center space-x-6 sm:space-x-8">
           <a
-            href="https://github.com/taruntejaguna/Oneplusclock"
+            href="https://github.com/gunatarun007/oneplusclock"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
+            className="hover:text-[#F5F5F5] transition-colors"
           >
             GitHub
           </a>
           <a
-            href="https://github.com/taruntejaguna/Oneplusclock/releases"
+            href="https://github.com/gunatarun007/oneplusclock/releases"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition-colors"
+            className="hover:text-[#F5F5F5] transition-colors"
           >
             Releases
           </a>
           <a
-            href="https://www.linkedin.com/in/taruntejaguna"
+            href="https://github.com/gunatarun007"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-neutral-400 hover:text-white transition-colors"
+            className="hover:text-[#F5F5F5] transition-colors"
           >
-            Built with ❤️ by <span className="underline decoration-neutral-600 underline-offset-2">taruntejaguna</span>
+            Built by Tarun Teja
           </a>
         </div>
       </div>

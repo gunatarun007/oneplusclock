@@ -7,23 +7,29 @@
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     color-scheme: dark;
     scroll-behavior: smooth;
+    background-color: #050505;
+    color: #F5F5F5;
   }
 
-  /* Custom Sleek Dark Scrollbar */
+  body {
+    background-color: #050505;
+    color: #F5F5F5;
+    overflow-x: hidden;
+  }
+
+  /* Custom Sleek Minimal Scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #08090B;
+    background: #050505;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #23252d;
+    background: #222222;
     border-radius: 9999px;
-    border: 2px solid #08090B;
-    transition: background 0.2s ease;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -33,27 +39,15 @@
   /* Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: #23252d #08090B;
+    scrollbar-color: #222222 #050505;
   }
-}
 
-/* Subtle glow for the red accent */
-.accent-glow {
-  text-shadow: 0 0 40px rgba(233, 40, 40, 0.45);
-}
-
-.card-glow {
-  box-shadow: 0 0 50px -10px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-/* Custom dashed line animation for motion path */
-@keyframes dash {
-  to {
-    stroke-dashoffset: -40;
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
-}
-
-.animate-motion-path {
-  stroke-dasharray: 6 6;
-  animation: dash 3s linear infinite;
 }
