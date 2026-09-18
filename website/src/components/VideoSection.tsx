@@ -23,7 +23,7 @@ export const VideoSection: React.FC = () => {
       <div className="w-full relative rounded-2xl sm:rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-black/80 bg-black/60">
         <video
           ref={videoRef}
-          src="/oneplus-clock-demo.mp4"
+          src="./oneplus-clock-demo.mp4"
           autoPlay
           muted
           loop

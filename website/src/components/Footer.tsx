@@ -30,7 +30,15 @@ export const Footer: React.FC = () => {
             Releases
           </a>
           <a
-            href="https://github.com/gunatarun007"
+            href="https://www.linkedin.com/in/taruntejaguna"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#F5F5F5] transition-colors"
+          >
+            LinkedIn
+          </a>
+          <a
+            href="https://www.linkedin.com/in/taruntejaguna"
             target="_blank"
             rel="noopener noreferrer"
             className="hover:text-[#F5F5F5] transition-colors"
