@@ -25,12 +25,10 @@ export const Navbar: React.FC = () => {
             GitHub
           </a>
           <a
-            href="https://github.com/gunatarun007/oneplusclock/releases/latest"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="https://github.com/gunatarun007/oneplusclock/releases/download/v1.0.0/onepluswidget_1.0.0_x64-setup.exe"
             className="text-[#F5F5F5] hover:text-white transition-colors font-medium"
           >
-            Download
+            Download (.exe)
           </a>
         </nav>
       </div>

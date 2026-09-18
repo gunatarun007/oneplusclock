@@ -24,13 +24,11 @@ export const Hero: React.FC = () => {
       {/* Actions */}
       <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
         <a
-          href="https://github.com/gunatarun007/oneplusclock/releases/latest"
-          target="_blank"
-          rel="noopener noreferrer"
+          href="https://github.com/gunatarun007/oneplusclock/releases/download/v1.0.0/onepluswidget_1.0.0_x64-setup.exe"
           className="inline-flex items-center space-x-2.5 bg-[#F5F5F5] hover:bg-white text-[#050505] px-7 py-3.5 rounded-full font-semibold text-sm sm:text-base transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-xl hover:shadow-white/10 active:translate-y-0 cursor-pointer"
         >
           <WindowsIcon className="w-4 h-4 text-black" />
-          <span>Download for Windows</span>
+          <span>Download for Windows (.exe)</span>
         </a>
 
         <a
