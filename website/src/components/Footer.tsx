@@ -1,17 +1,19 @@
 import React from 'react';
+import { OnePlusLogo } from './OnePlusLogo';
 
 export const Footer: React.FC = () => {
   return (
-    <footer className="relative bg-[#08090B] border-t border-white/[0.04] py-8">
-      <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs sm:text-[13px] text-neutral-400">
-        {/* Left */}
+    <footer className="relative bg-[#08090B] border-t border-white/[0.06] py-10">
+      <div className="max-w-7xl mx-auto px-6 sm:px-12 flex flex-col sm:flex-row items-center justify-between gap-6 text-xs sm:text-[13px] text-neutral-400">
+        {/* Left: Brand Identity */}
         <div className="flex items-center space-x-3">
-          <span className="font-bold text-white tracking-tight">Clock</span>
-          <span className="text-neutral-600">|</span>
-          <span>A minimal desktop clock for Windows.</span>
+          <OnePlusLogo size={20} />
+          <span className="font-bold text-white tracking-tight">OnePlus Clock</span>
+          <span className="text-neutral-600">•</span>
+          <span>Minimal desktop clock for Windows.</span>
         </div>
 
-        {/* Right */}
+        {/* Right: Links */}
         <div className="flex items-center space-x-6 sm:space-x-8">
           <a
             href="https://github.com/taruntejaguna/Oneplusclock"

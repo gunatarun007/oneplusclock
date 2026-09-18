@@ -1,179 +1,147 @@
 import React, { useState, useEffect } from 'react';
-import { WeatherIcon } from './WeatherIcon';
 
 export interface LiveClockProps {
   live?: boolean;
   timeString?: string;
-  variant?: 'side-weather' | 'large-info' | 'compact' | 'vertical' | 'horizontal' | 'minimal';
+  variant?: 'day-clock' | 'horizontal' | 'vertical' | 'compact';
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'giant';
-  showWeather?: boolean;
+  showSeconds?: boolean;
   showDay?: boolean;
   showDate?: boolean;
-  weatherTemp?: number | string;
-  weatherCondition?: string;
   dayText?: string;
   dateText?: string;
 }
 
+const MONTHS_FULL = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
+
+const DAYS_FULL = [
+  'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'
+];
+
 export const LiveClock: React.FC<LiveClockProps> = ({
-  live = false,
+  live = true,
   timeString = '19:48',
-  variant = 'side-weather',
+  variant = 'day-clock',
   className = '',
   size = 'lg',
-  showWeather = true,
+  showSeconds = false,
   showDay = true,
   showDate = true,
-  weatherTemp = 26,
-  weatherCondition = 'cloudy',
   dayText,
   dateText,
 }) => {
-  const [time, setTime] = useState(timeString);
+  const [hours, setHours] = useState(() => {
+    const parts = timeString.includes(':') ? timeString.split(':') : ['19', '48'];
+    return parts[0] || '19';
+  });
+  const [minutes, setMinutes] = useState(() => {
+    const parts = timeString.includes(':') ? timeString.split(':') : ['19', '48'];
+    return parts[1] || '48';
+  });
+  const [seconds, setSeconds] = useState('00');
   const [currentDay, setCurrentDay] = useState(dayText || 'Friday');
-  const [currentDate, setCurrentDate] = useState(dateText || 'Oct 26');
-  const [currentDateShort, setCurrentDateShort] = useState('Oct 26, Fri');
+  const [currentDateWithMonth, setCurrentDateWithMonth] = useState(dateText || 'October 26');
 
   useEffect(() => {
     if (!live) return;
 
     const updateDateTime = () => {
       const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      setTime(`${hours}:${minutes}`);
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+
+      setHours(h);
+      setMinutes(m);
+      setSeconds(s);
 
       if (!dayText) {
-        setCurrentDay(now.toLocaleDateString('en-US', { weekday: 'long' }));
+        setCurrentDay(DAYS_FULL[now.getDay()]);
       }
       if (!dateText) {
-        setCurrentDate(now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-        const shortDay = now.toLocaleDateString('en-US', { weekday: 'short' });
-        const shortMonth = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-        setCurrentDateShort(`${shortMonth}, ${shortDay}`);
+        setCurrentDateWithMonth(`${MONTHS_FULL[now.getMonth()]} ${now.getDate()}`);
       }
     };
 
     updateDateTime();
-    const interval = setInterval(updateDateTime, 1000);
+    const interval = setInterval(updateDateTime, showSeconds ? 1000 : 1000);
     return () => clearInterval(interval);
-  }, [live, dayText, dateText]);
+  }, [live, showSeconds, dayText, dateText]);
 
-  const [hours, minutes] = time.includes(':') ? time.split(':') : [time.slice(0, 2), time.slice(2, 4)];
-  const firstHourDigit = hours ? hours[0] : '1';
-  const secondHourDigit = hours ? hours.slice(1) : '9';
+  const firstHourDigit = hours ? hours.charAt(0) : '1';
+  const restHourDigits = hours ? hours.slice(1) : '9';
 
-  // Typography size classes
+  // Typography size scales
   const sizeClasses = {
-    sm: 'text-3xl sm:text-4xl',
+    sm: 'text-4xl sm:text-5xl',
     md: 'text-5xl sm:text-6xl',
-    lg: 'text-6xl sm:text-7xl md:text-8xl lg:text-[88px]',
+    lg: 'text-6xl sm:text-7xl md:text-8xl lg:text-[92px]',
     xl: 'text-7xl sm:text-8xl md:text-9xl',
-    giant: 'text-8xl sm:text-9xl md:text-[140px] lg:text-[170px]',
+    giant: 'text-8xl sm:text-9xl md:text-[140px] lg:text-[160px]',
+  };
+
+  const labelSizeClasses = {
+    sm: 'text-xs sm:text-sm',
+    md: 'text-sm sm:text-base',
+    lg: 'text-base sm:text-lg md:text-xl',
+    xl: 'text-lg sm:text-xl md:text-2xl',
+    giant: 'text-xl sm:text-2xl md:text-3xl',
   };
 
   const fontClass = `font-bold tracking-tighter leading-none select-none ${sizeClasses[size] || sizeClasses.lg}`;
+  const labelClass = `font-medium tracking-tight select-none ${labelSizeClasses[size] || labelSizeClasses.lg}`;
 
-  // 1. OxygenOS 5x2 Side-by-Side: Time on left, Weather + Date on right
-  if (variant === 'side-weather') {
+  // 1. Day + Clock (Matches desktop app's VariantDayClock)
+  if (variant === 'day-clock') {
     return (
-      <div className={`flex items-center space-x-5 select-none ${className}`}>
-        {/* Big Time with Red Accent */}
-        <div className={`flex items-baseline ${fontClass}`}>
-          <span className="text-[#E92828] drop-shadow-sm">{firstHourDigit}</span>
-          <span className="text-white">{secondHourDigit}:{minutes}</span>
-        </div>
-
-        {/* Side Info: Weather & Date */}
-        {(showWeather || showDate) && (
-          <div className="flex flex-col items-start justify-center space-y-1 pl-1 border-l border-white/10">
-            {showWeather && (
-              <div className="flex items-center space-x-1.5 text-white text-base sm:text-lg font-semibold tracking-tight">
-                <WeatherIcon condition={weatherCondition} className="w-5 h-5 text-white/90" />
-                <span>{weatherTemp}°</span>
-              </div>
-            )}
-            {showDate && (
-              <div className="text-neutral-400 text-xs sm:text-sm font-medium tracking-tight whitespace-nowrap">
-                {currentDateShort}
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // 2. Large Information: Day on top, Time in middle, Date + Weather on bottom
-  if (variant === 'large-info') {
-    return (
-      <div className={`flex flex-col items-start select-none ${className}`}>
+      <div className={`flex flex-col items-center justify-center text-center select-none ${className}`}>
+        {/* Day Label on Top */}
         {showDay && (
-          <span className="text-sm sm:text-base font-semibold text-neutral-400 tracking-tight mb-2">
+          <div className={`${labelClass} text-white/90 mb-2 sm:mb-3`}>
             {currentDay}
-          </span>
-        )}
-        <div className={`flex items-baseline ${fontClass}`}>
-          <span className="text-[#E92828] drop-shadow-sm">{firstHourDigit}</span>
-          <span className="text-white">{secondHourDigit}:{minutes}</span>
-        </div>
-        {(showDate || showWeather) && (
-          <div className="flex items-center space-x-2.5 mt-3 text-sm sm:text-base font-medium text-neutral-300">
-            {showDate && <span>{currentDate}</span>}
-            {showDate && showWeather && <span className="text-neutral-500">•</span>}
-            {showWeather && (
-              <div className="flex items-center space-x-1.5">
-                <WeatherIcon condition={weatherCondition} className="w-4 h-4 text-white/90" />
-                <span className="font-semibold text-white">{weatherTemp}°</span>
-                <span className="text-neutral-400 capitalize">{weatherCondition}</span>
-              </div>
-            )}
           </div>
         )}
-      </div>
-    );
-  }
 
-  // 3. Compact: Time on top, Date and Weather side-by-side on bottom
-  if (variant === 'compact') {
-    return (
-      <div className={`flex flex-col items-start select-none ${className}`}>
-        <div className={`flex items-baseline ${fontClass}`}>
+        {/* Time Display with Iconic Red Accent */}
+        <div className={`flex items-baseline justify-center ${fontClass}`}>
           <span className="text-[#E92828] drop-shadow-sm">{firstHourDigit}</span>
-          <span className="text-white">{secondHourDigit}:{minutes}</span>
-        </div>
-        <div className="flex items-center space-x-3 mt-2 text-xs sm:text-sm font-medium text-neutral-300">
-          {showDate && <span>{currentDateShort}</span>}
-          {showWeather && (
-            <div className="flex items-center space-x-1">
-              <WeatherIcon condition={weatherCondition} className="w-4 h-4 text-white/90" />
-              <span className="font-semibold">{weatherTemp}°</span>
-            </div>
+          <span className="text-white">{restHourDigits}</span>
+          <span className="text-white mx-0.5 sm:mx-1 opacity-90">:</span>
+          <span className="text-white">{minutes}</span>
+          {showSeconds && (
+            <span className="text-white/70 text-[0.45em] ml-1.5 font-normal">
+              :{seconds}
+            </span>
           )}
         </div>
+
+        {/* Date Label on Bottom */}
+        {showDate && (
+          <div className={`${labelClass} text-white/75 font-normal mt-2 sm:mt-3`}>
+            {currentDateWithMonth}
+          </div>
+        )}
       </div>
     );
   }
 
-  // 4. Vertical Stacked: 19 over 48 with weather
+  // 2. Vertical Stacked (Matches desktop app's VariantVertical)
   if (variant === 'vertical') {
     return (
-      <div className={`flex flex-col items-center justify-center select-none ${className}`}>
+      <div className={`flex flex-col items-center justify-center text-center select-none ${className}`}>
         {showDate && (
-          <span className="text-xs sm:text-sm font-medium text-neutral-400 mb-1.5">{currentDateShort}</span>
-        )}
-        {showWeather && (
-          <div className="flex items-center space-x-1.5 text-xs sm:text-sm font-semibold text-white mb-2">
-            <span className="capitalize text-neutral-400">{weatherCondition}</span>
-            <WeatherIcon condition={weatherCondition} className="w-4 h-4 text-white/90" />
-            <span>{weatherTemp}°</span>
+          <div className={`${labelClass} text-white/75 font-normal mb-2`}>
+            {currentDateWithMonth}
           </div>
         )}
-        <div className="flex flex-col items-center font-bold tracking-tighter leading-[0.82]">
+        <div className="flex flex-col items-center font-bold tracking-tighter leading-[0.85] text-6xl sm:text-7xl md:text-8xl">
           <div className="flex items-baseline">
             <span className="text-[#E92828]">{firstHourDigit}</span>
-            <span className="text-white">{secondHourDigit}</span>
+            <span className="text-white">{restHourDigits}</span>
           </div>
           <div className="text-white">
             {minutes}
@@ -183,25 +151,18 @@ export const LiveClock: React.FC<LiveClockProps> = ({
     );
   }
 
-  // Default: Horizontal with clean day + weather underneath
+  // 3. Compact / Horizontal (Matches desktop app's VariantHorizontal / VariantCompact)
   return (
-    <div className={`flex flex-col items-start select-none ${className}`}>
-      <div className={`flex items-baseline ${fontClass}`}>
+    <div className={`flex flex-col items-center justify-center text-center select-none ${className}`}>
+      <div className={`flex items-baseline justify-center ${fontClass}`}>
         <span className="text-[#E92828] drop-shadow-sm">{firstHourDigit}</span>
-        <span className="text-white">{secondHourDigit}:{minutes}</span>
+        <span className="text-white">{restHourDigits}</span>
+        <span className="text-white mx-0.5 sm:mx-1 opacity-90">:</span>
+        <span className="text-white">{minutes}</span>
       </div>
-      {(showDay || showDate || showWeather) && (
-        <div className="flex items-center space-x-2.5 mt-2.5 text-xs sm:text-sm font-medium text-neutral-300">
-          <span>{currentDay}, {currentDate}</span>
-          {showWeather && (
-            <>
-              <span className="text-neutral-500">•</span>
-              <div className="flex items-center space-x-1 text-white font-semibold">
-                <WeatherIcon condition={weatherCondition} className="w-4 h-4 text-white/90" />
-                <span>{weatherTemp}°</span>
-              </div>
-            </>
-          )}
+      {showDate && (
+        <div className={`${labelClass} text-neutral-300 mt-2`}>
+          {currentDay}, {currentDateWithMonth}
         </div>
       )}
     </div>
